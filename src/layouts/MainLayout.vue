@@ -15,7 +15,17 @@
           Statuze App
         </q-toolbar-title>
 
-        <div>v1.0.0</div>
+        <q-btn
+          flat
+          dense
+          round
+          @click="logout"
+          arial-label="Logout">
+
+          <q-icon name="exit_to_app"></q-icon>
+
+        </q-btn>
+
       </q-toolbar>
     </q-header>
 
@@ -48,6 +58,7 @@
 
 <script>
 import Menu from 'components/Menu'
+import { LocalStorage, Notify } from 'quasar'
 
 export default {
   name: 'MainLayout',
@@ -65,14 +76,25 @@ export default {
           caption: 'Status',
           icon: 'access_time',
           link: '/'
-        },
-        {
-          title: 'Login',
-          caption: '',
-          icon: 'account_circle',
-          link: '/login'
         }
       ]
+    }
+  },
+  methods: {
+    logout () {
+      this.$axios.post('/auth/logout')
+        .then(() => {
+          LocalStorage.remove('statuze_access_token')
+          this.$router.push('/login')
+        })
+        .catch((error) => {
+          Notify.create({
+            message: error.message,
+            position: 'top',
+            color: 'red',
+            icon: 'error_outline'
+          })
+        })
     }
   }
 }

@@ -1,75 +1,114 @@
 <template>
-  <q-page class="bg-light window-height window-width row justify-center items-center">
-    <div class="column">
-      <div class="row">
-        <h5 class="text-h5 q-my-md">Login</h5>
-      </div>
-      <div class="row">
-        <q-card square bordered class="q-pa-lg shadow-1">
-          <q-card-section>
-            <q-input v-model="token" type="text" label="token" />
-          </q-card-section>
-          <q-card-section>
-            <q-form class="q-gutter-md">
-              <q-input square filled clearable v-model="email" type="email" label="email" />
-              <q-input square filled clearable v-model="password" type="password" label="password" />
-            </q-form>
-          </q-card-section>
-          <q-card-actions class="q-px-md">
-            <q-btn v-on:click="login()" unelevated color="light-green-7" size="lg" class="full-width" label="Login" />
-          </q-card-actions>
-          <q-card-actions class="q-px-md">
-            <q-btn v-on:click="logout()" unelevated color="light-blue-3" size="lg" class="full-width" label="Logout" />
-          </q-card-actions>
-          <q-card-section class="text-center q-pa-none">
-            <p class="text-grey-3">Not reigistered? Created an Account</p>
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
+  <q-page class="flex flex-center">
+    <q-card style="width: 350px">
+
+      <q-bar class="bg-black glossy unelevated text-white">
+        <q-label>Autenticação</q-label>
+
+        <q-space />
+
+        <q-btn
+          glossy unelevated
+          color="grey-4"
+          text-color="black"
+          icon="lock"
+          @click="showDialog = !showDialog"
+        />
+
+      </q-bar>
+
+      <q-card-section>
+        <q-input outlined
+          ref="email"
+          v-model="email"
+          label="Email"
+          placeholder=""
+          hint=""
+          :rules="[
+            val => !!val || 'Email obrigatório',
+            val => this.validateEmail(val) || 'Formato de email inválido'
+          ]" />
+      </q-card-section>
+
+      <q-card-section>
+        <q-input outlined
+          ref="password"
+          v-model="password"
+          label="Senha"
+          type="password"
+          placeholder=""
+          hint=""
+          :rules="[val => !!val || 'Senha obrigatória']" />
+      </q-card-section>
+
+      <q-card-section>
+        <q-btn
+          glossy unelevated
+          push
+          color="primary"
+          text-color="black"
+          label="Entrar"
+          class="full-width"
+          size="lg"
+          @click="login"
+        />
+      </q-card-section>
+
+    </q-card>
   </q-page>
 </template>
 
-<style>
-  .q-card {
-      width: 360px;
-    }
-</style>
-
 <script>
-import { LocalStorage } from 'quasar'
+import isEmail from 'validator/lib/isEmail'
+import { LocalStorage, Notify } from 'quasar'
 
 export default {
-  name: 'Login',
+  name: 'PageLogin',
+
   data () {
     return {
-      email: 'asantos@lliege.com.br',
-      password: 'change123',
-      token: ''
+      email: '',
+      password: ''
     }
   },
   methods: {
+    validateEmail (value) {
+      return isEmail(value)
+    },
     login () {
-      this.$axios.post('/auth/login',
-        {
+      const emailSelector = this.$refs.email
+      const passwordSelector = this.$refs.password
+
+      emailSelector.validate()
+      passwordSelector.validate()
+
+      if (emailSelector.hasError || passwordSelector.hasError) {
+        return false
+      } else {
+        const data = {
           email: this.email,
           password: this.password
         }
-      )
+
+        this.tryAuth(data)
+      }
+    },
+    tryAuth (payload) {
+      this.$axios.post('/auth/login', payload)
         .then((response) => {
           LocalStorage.set('statuze_access_token', response.data.access_token)
-          this.token = response.data.access_token
+          this.$router.push('/')
         })
-        .catch((error) => console.log(error))
-    },
-    logout () {
-      this.$axios.post('/auth/logout')
-        .then((response) => {
-          LocalStorage.removeItem('statuze_access_token')
-          this.token = ''
+        .catch((error) => {
+          Notify.create({
+            message: error.message,
+            position: 'top',
+            color: 'red',
+            icon: 'error_outline'
+          })
         })
-        .catch((error) => console.log(error))
     }
   }
 }
+
 </script>

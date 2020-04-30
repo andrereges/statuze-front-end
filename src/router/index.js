@@ -1,18 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
 import routes from './routes'
+import { LocalStorage } from 'quasar'
 
 Vue.use(VueRouter)
-
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
 
 export default function (/* { store, ssrContext } */) {
   const Router = new VueRouter({
@@ -24,6 +15,21 @@ export default function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
+  })
+
+  // Acesso as páginas após login
+  Router.beforeEach((to, from, next) => {
+    if (to.matched.some(item => item.meta.requiresAuth)) {
+      const authUser = LocalStorage.getItem('statuze_access_token')
+
+      if (authUser) {
+        next()
+      } else {
+        next({ name: 'login' })
+      }
+    } else {
+      next()
+    }
   })
 
   return Router
