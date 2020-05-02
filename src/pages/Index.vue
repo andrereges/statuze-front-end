@@ -5,38 +5,40 @@
       <q-list
         dense
         highlight
-        v-for="group in groupsWithItems"
-        :key="group.id"
-        :data-id="group.id"
+        v-for="status in statusWithUsers"
+        :key="status.id"
+        :data-id="status.id"
         class="app-custom-list q-pa-md"
-        @added="added($event, group)"
-        @removed="removed($event, group)"
-        @reordered="reordered($event, group)"
+        @added="added($event, status)"
+        @removed="removed($event, status)"
+        @reordered="reordered($event, status)"
       >
 
-      <q-list-header class="q-pa-md row">
-         <q-toolbar class="glossy text-white" :class="group.color">
-          <q-toolbar-title class="label">{{ group.id }}</q-toolbar-title>
+      <q-list-header class="row" style="width: 17rem;">
+         <q-toolbar class="glossy text-white" :class="status.color">
+
+          <q-toolbar-title class="label text-center">{{ status.name }}</q-toolbar-title>
+
           <q-btn flat round dense icon="assignment_ind" >
-            <q-badge floating color="black">{{ group.items.length }}</q-badge>
+            <q-badge floating color="black">{{ status.users.length }}</q-badge>
           </q-btn>
         </q-toolbar>
       </q-list-header>
 
         <q-item
           items-center
-          v-for="item in group.items"
-          :key="item.id"
-          :data-id="item.id"
+          v-for="user in status.users"
+          :key="user.id"
+          :data-id="user.id"
           class="app-custom-item"
         >
 
-          <q-item-section avatar top class="q-ml-none q-pa-xs">
+          <q-item-section avatar top class="q-ml-none q-pa-xs q-pa-md">
             <q-chip>
               <q-avatar rounded size="48px">
-                <img :src="item.image" width="50" height="50">
+                <img :src="user.image" width="50" height="50">
               </q-avatar>
-              <q-item-label class="label">{{ item.name }}</q-item-label>
+              <q-item-label class="label">{{ user.name }}</q-item-label>
             </q-chip>
           </q-item-section>
 
@@ -48,11 +50,13 @@
 </template>
 
 <script>
+import { Notify } from 'quasar'
+
 export default {
   name: 'Index',
   data () {
     return {
-      groupsWithItems: [],
+      statusWithUsers: [],
       options: {
         multipleDropzonesItemsDraggingEnabled: true,
         dropzoneSelector: '.q-list',
@@ -62,52 +66,40 @@ export default {
   },
   mounted () {
     this.getStatuses()
-    this.getUsers()
   },
   methods: {
-    added (event, group) {
-      const newItems = this.groupsWithItems.map((group) => group.items)
+    added (event, status) {
+      const newUsers = this.statusWithUsers.map((status) => status.users)
         .reduce((prev, curr) => [...prev, ...curr], [])
-        .filter((item) => event.detail.ids.map(Number).indexOf(item.id) >= 0)
-      group.items.splice(event.detail.index, 0, ...newItems)
+        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
+      status.users.splice(event.detail.index, 0, ...newUsers)
     },
-    removed (event, group) {
-      group.items = group.items
-        .filter((item) => event.detail.ids.map(Number).indexOf(item.id) < 0)
+    removed (event, status) {
+      status.users = status.users
+        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
     },
-    reordered (event, group) {
-      const reorderedItems =
-        group.items.filter((item) => event.detail.ids.map(Number).indexOf(item.id) >= 0)
-      const newItems = group.items
-        .filter((item) => event.detail.ids.map(Number).indexOf(item.id) < 0)
-      newItems.splice(event.detail.index, 0, ...reorderedItems)
-      group.items = newItems
+    reordered (event, status) {
+      const reorderedUsers =
+        status.users.filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
+      const newUsers = status.users
+        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+      newUsers.splice(event.detail.index, 0, ...reorderedUsers)
+      status.users = newUsers
     },
     getStatuses () {
-      this.$axios.get('/status')
+      this.$axios.get('/status-with-users')
         .then((response) => {
-          this.groupsWithItems = response.data.data.map(status => {
-            return {
-              id: status.name,
-              color: status.color,
-              items: []
-            }
+          if (response.data.data) {
+            this.statusWithUsers = response.data.data
+          }
+        }).catch((error) => {
+          Notify.create({
+            message: error.message,
+            position: 'top',
+            color: 'red',
+            icon: 'error_outline'
           })
-        }).catch((error) => console.log(error))
-    },
-    getUsers () {
-      this.$axios.get('/user')
-        .then((response) => {
-          response.data.data.forEach((user) => {
-            const userName = user.user_status.status.name
-
-            this.groupsWithItems.forEach((group) => {
-              if (userName === group.id) {
-                group.items.push(user)
-              }
-            })
-          })
-        }).catch((error) => console.log(error))
+        })
     }
   }
 }
@@ -116,7 +108,7 @@ export default {
 <style>
 .app-custom-list {
   min-width: 10rem;
-  height: 90vh;
+  /* height: 90vh; */
   margin-top: 0 !important;
 }
 .app-custom-item[aria-grabbed="true"] {

@@ -20,12 +20,12 @@ export default function (/* { store, ssrContext } */) {
   // Acesso as páginas após login
   Router.beforeEach((to, from, next) => {
     if (to.matched.some(item => item.meta.requiresAuth)) {
-      const authUser = LocalStorage.getItem('statuze_access_token')
+      const isAuthenticated = LocalStorage.getItem('statuze_access_token')
 
-      if (authUser) {
-        next()
-      } else {
+      if (to.name !== 'login' && !isAuthenticated) {
         next({ name: 'login' })
+      } else {
+        next()
       }
     } else {
       next()

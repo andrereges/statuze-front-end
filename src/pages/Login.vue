@@ -96,7 +96,8 @@ export default {
     tryAuth (payload) {
       this.$axios.post('/auth/login', payload)
         .then((response) => {
-          LocalStorage.set('statuze_access_token', response.data.access_token)
+          const token = response.data.access_token
+          LocalStorage.set('statuze_access_token', token)
           this.$router.push('/')
         })
         .catch((error) => {
