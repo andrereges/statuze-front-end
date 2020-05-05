@@ -21,7 +21,7 @@
         <q-input outlined
           ref="email"
           v-model="email"
-          label="Email"
+          label="Email*"
           placeholder=""
           hint=""
           :rules="[
@@ -34,7 +34,7 @@
         <q-input outlined
           ref="password"
           v-model="password"
-          label="Senha"
+          label="Senha*"
           type="password"
           placeholder=""
           hint=""
@@ -67,8 +67,8 @@ export default {
 
   data () {
     return {
-      email: '',
-      password: ''
+      email: 'asantos@lliege.com.br',
+      password: 'change123'
     }
   },
   methods: {
@@ -98,6 +98,7 @@ export default {
         .then((response) => {
           const token = response.data.access_token
           LocalStorage.set('statuze_access_token', token)
+          LocalStorage.set('statuze_logged_user', response.data.logged_user)
           this.$router.push('/')
         })
         .catch((error) => {

@@ -1,7 +1,71 @@
 <template>
   <div class="q-pa-md">
-    <div class="row q-gutter-sm justify-center" v-drag-and-drop="options">
+    <div class="row q-gutter-sm justify-center" v-drag-and-drop="options" draggable="false">
 
+      <q-dialog v-model="dialog">
+      <q-card style="width: 350px">
+
+      <q-card-section>
+
+        <q-select
+          outlined
+          v-model="user.reason"
+          ref="user.reason"
+          :options="statusWithReasons"
+          :option-value="opt => Object(opt) === opt && 'id' in opt ? opt.id : ''"
+          :option-label="opt => Object(opt) === opt && 'name' in opt ? opt.name : ''"
+          label="Motivo*"
+          :rules="[
+            val => !!val || 'Motivo obrigatório'
+          ]">
+        </q-select>
+
+        <q-input
+          ref="user.reason.expectedReturn"
+          :label="expectedReturnLabel"
+          outlined
+          v-model="user.reason.expectedReturn"
+          mask="time"
+          hint=""
+          :rules="['time']">
+          <template v-slot:append>
+            <q-icon name="access_time" class="cursor-pointer">
+              <q-popup-proxy transition-show="scale" transition-hide="scale">
+                <q-time
+                  v-model="user.reason.expectedReturn"
+                  format24h
+                />
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
+
+        <q-input outlined
+          ref="user.note"
+          v-model="user.note"
+          label="Anotação"
+          type="textarea"
+          maxlength="255"
+          placeholder=""
+          hint="" />
+
+      </q-card-section>
+
+      <q-card-section>
+        <q-btn
+          glossy unelevated
+          push
+          color="primary"
+          text-color="black"
+          label="Feito"
+          class="full-width"
+          size="lg"
+          @click="changeStatus"
+        />
+      </q-card-section>
+
+    </q-card>
+      </q-dialog>
       <q-list
         dense
         highlight
@@ -12,6 +76,7 @@
         @added="added($event, status)"
         @removed="removed($event, status)"
         @reordered="reordered($event, status)"
+        @dblclick="showDetails($event)"
       >
 
       <q-list-header class="row" style="width: 17rem;">
@@ -38,7 +103,7 @@
               <q-avatar rounded size="48px">
                 <img :src="user.image" width="50" height="50">
               </q-avatar>
-              <q-item-label class="label">{{ user.name }}</q-item-label>
+              <q-item-label class="label">{{ user.nickName }}</q-item-label>
             </q-chip>
           </q-item-section>
 
@@ -56,29 +121,94 @@ export default {
   name: 'Index',
   data () {
     return {
-      statusWithUsers: [],
+      statusWithUsers: this.getStatusesWithUsers(),
+      statusWithReasons: [],
+      expectedReturnLabel: '',
+      statusSelected: '',
+      user: {
+        reason: {},
+        note: ''
+      },
+      dialog: false,
       options: {
-        multipleDropzonesItemsDraggingEnabled: true,
+        multipleDropzonesItemsDraggingEnabled: false,
         dropzoneSelector: '.q-list',
-        draggableSelector: '.q-item'
+        reactivityEnabled: true,
+        draggableSelector: '.q-item',
+        onDrop: (event) => {}
       }
     }
   },
-  mounted () {
-    this.getStatuses()
-  },
+  // watch: {},
+  computed: {},
   methods: {
+    callDialog () {
+      this.dialog = true
+      this.statusWithReasons = []
+      this.user.reason = {}
+      this.user.note = ''
+      this.expectedReturnLabel = `${this.statusSelected.name} até`
+      this.getStatuses(this.statusSelected)
+    },
+    changeStatus () {
+      const dateTime = this.$globals.myFunctions
+        .formatDateTime(this.user.reason.expectedReturn)
+
+      const data = {
+        status: this.statusSelected.id,
+        reason: this.user.reason.id,
+        to: dateTime,
+        note: this.user.note
+      }
+
+      if (data.status && data.reason) {
+        this.tryChangeStatus(data)
+        this.dialog = false
+      } else {
+        Notify.create({
+          message: 'O informe os campos obrigatórios',
+          position: 'top',
+          color: 'red',
+          icon: 'error_outline'
+        })
+      }
+    },
+    showDetails () {
+      this.dialog = true
+    },
+    isUserLogged (event) {
+      if (event.detail.ids[0] === `${this.$globals.user.id}`) return true
+    },
     added (event, status) {
+      if (!this.isUserLogged(event)) return
+      event.detail.index = 0
+      event.detail.ids = []
+      event.detail.ids[0] = `${this.$globals.user.id}`
+      this.statusSelected = status
+      this.callDialog()
+
+      status.users
+        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+
       const newUsers = this.statusWithUsers.map((status) => status.users)
         .reduce((prev, curr) => [...prev, ...curr], [])
         .filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
       status.users.splice(event.detail.index, 0, ...newUsers)
     },
     removed (event, status) {
+      if (!this.isUserLogged(event)) return
+      event.detail.ids = []
+      event.detail.ids[0] = `${this.$globals.user.id}`
+
       status.users = status.users
         .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
     },
     reordered (event, status) {
+      if (!this.isUserLogged(event)) return
+      event.detail.index = 0
+      event.detail.ids = []
+      event.detail.ids[0] = `${this.$globals.user.id}`
+
       const reorderedUsers =
         status.users.filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
       const newUsers = status.users
@@ -86,13 +216,41 @@ export default {
       newUsers.splice(event.detail.index, 0, ...reorderedUsers)
       status.users = newUsers
     },
-    getStatuses () {
-      this.$axios.get('/status-with-users')
+    getStatusesWithUsers () {
+      this.$axios.get('/status/users')
         .then((response) => {
           if (response.data.data) {
             this.statusWithUsers = response.data.data
           }
         }).catch((error) => {
+          Notify.create({
+            message: error.message,
+            position: 'top',
+            color: 'red',
+            icon: 'error_outline'
+          })
+        })
+    },
+    getStatuses (statusSelected) {
+      this.$axios.get(`/status/${statusSelected.id}`)
+        .then((response) => {
+          if (response.data.data) {
+            response.data.data.reasons.map(reason => {
+              this.statusWithReasons.push({
+                id: reason.id,
+                name: reason.name,
+                expectedReturn: reason.expected_return
+              })
+            })
+          }
+        })
+    },
+    tryChangeStatus (data) {
+      this.$axios.post('/user-status', data)
+        .then((response) => {
+          this.$globals.myFunctions.refreshPage()
+        })
+        .catch((error) => {
           Notify.create({
             message: error.message,
             position: 'top',
