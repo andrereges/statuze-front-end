@@ -60,10 +60,10 @@
 
 <script>
 import isEmail from 'validator/lib/isEmail'
-import { LocalStorage, Notify } from 'quasar'
+import { Notify, LocalStorage } from 'quasar'
 
 export default {
-  name: 'PageLogin',
+  name: 'Login',
 
   data () {
     return {
@@ -96,10 +96,10 @@ export default {
     tryAuth (payload) {
       this.$axios.post('/auth/login', payload)
         .then((response) => {
-          const token = response.data.access_token
-          LocalStorage.set('statuze_access_token', token)
-          LocalStorage.set('statuze_logged_user', response.data.logged_user)
-          this.$router.push('/')
+          LocalStorage.set('statuze_user', response.data.logged_user)
+          LocalStorage.set('statuze_access_token', response.data.access_token)
+          LocalStorage.set('statuze_token_expires_in', response.data.expires_in)
+          this.$router.push({ name: 'home' })
         })
         .catch((error) => {
           Notify.create({
@@ -110,6 +110,13 @@ export default {
           })
         })
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (vm.$globals.logged_user) {
+        vm.$router.push({ name: 'home' })
+      }
+    })
   }
 }
 

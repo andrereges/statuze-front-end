@@ -79,7 +79,7 @@ export default {
 
   data () {
     return {
-      loggedUser: '',
+      loggedUser: this.$globals.logged_user,
       links: [
         {
           title: 'Home',
@@ -90,15 +90,14 @@ export default {
       ]
     }
   },
-  mounted () {
-    this.loggedUser = this.$globals.user
-  },
   methods: {
     logout () {
+      LocalStorage.remove('statuze_user')
+      LocalStorage.remove('statuze_access_token')
+      LocalStorage.remove('statuze_token_expires_in')
+
       this.$axios.post('/auth/logout')
         .then(() => {
-          LocalStorage.remove('statuze_access_token')
-          LocalStorage.remove('statuze_logged_user')
           this.$router.push('/login')
         })
         .catch(() => {

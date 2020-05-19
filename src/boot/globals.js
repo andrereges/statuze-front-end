@@ -3,7 +3,12 @@ import { LocalStorage } from 'quasar'
 const globals = {
   appName: 'Statuze App',
   version: '1.0.0',
-  user: LocalStorage.getItem('statuze_logged_user'),
+  isLogged: (new Date() >= LocalStorage.getItem('statuze_token_expires_in')),
+  logged_user: LocalStorage.getItem('statuze_user'),
+  token_info: {
+    token: LocalStorage.getItem('statuze_access_token'),
+    expires_in: LocalStorage.getItem('statuze_token_expires_in')
+  },
   myFunctions: {
     refreshPage: () => window.location.reload(),
     formatDateTime: (formHours) => {
@@ -15,8 +20,10 @@ const globals = {
       const day = d.getDate()
       const month = (d.getMonth() + 1)
       const year = d.getFullYear()
-      const hours = (parseInt(d.getHours()) + parseInt(formHours[0]))
-      const minutes = (parseInt(d.getMinutes()) + parseInt(formHours[1]))
+      const hours = formHours[0]
+      // const hours = (parseInt(d.getHours()) + parseInt(formHours[0]))
+      const minutes = formHours[1]
+      // const minutes = (parseInt(d.getMinutes()) + parseInt(formHours[1]))
       const seconds = d.getSeconds()
 
       const dt = new Date(year, month, day, hours, minutes, seconds)
@@ -24,7 +31,7 @@ const globals = {
       const date = [
         dt.getFullYear(),
         dt.getMonth().toString().padStart(2, '0'),
-        dt.getDay().toString().padStart(2, '0')
+        dt.getDate().toString().padStart(2, '0')
       ].join('-')
 
       const hour = [

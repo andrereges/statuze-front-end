@@ -2,9 +2,25 @@
   <div class="q-pa-md">
     <div class="row q-gutter-sm justify-center" v-drag-and-drop="options" draggable="false">
 
-      <q-dialog v-model="dialog">
+    <q-dialog v-model="dialog" persistent>
       <q-card style="width: 350px">
 
+      <q-card-section>
+        <q-bar class="justify-center glossy">
+          <q-btn
+            :label="statusOld.name"
+            class="full-width glossy text-black"
+            :class="statusOld.color" />
+          <q-btn
+            label=" => "
+            class="glossy text-black"
+          />
+          <q-btn
+            :label="statusSelected.name"
+            class="full-width glossy text-black"
+            :class="statusSelected.color" />
+        </q-bar>
+      </q-card-section>
       <q-card-section>
 
         <q-select
@@ -25,9 +41,7 @@
           :label="expectedReturnLabel"
           outlined
           v-model="user.reason.expectedReturn"
-          mask="time"
-          hint=""
-          :rules="['time']">
+          mask="time">
           <template v-slot:append>
             <q-icon name="access_time" class="cursor-pointer">
               <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -57,10 +71,21 @@
           push
           color="primary"
           text-color="black"
-          label="Feito"
+          label="Alterar"
           class="full-width"
           size="lg"
           @click="changeStatus"
+        />
+
+        <q-btn
+          v-close-popup
+          glossy unelevated
+          push
+          color="grey"
+          text-color="black"
+          label="Cancelar"
+          class="full-width"
+          size="lg"
         />
       </q-card-section>
 
@@ -118,17 +143,20 @@
 import { Notify } from 'quasar'
 
 export default {
-  name: 'Index',
+  name: 'Home',
   data () {
     return {
-      statusWithUsers: this.getStatusesWithUsers(),
+      statusWithUsers: [],
       statusWithReasons: [],
       expectedReturnLabel: '',
+      statusOld: '',
       statusSelected: '',
+      evento: null,
       user: {
         reason: {},
         note: ''
       },
+      process: false,
       dialog: false,
       options: {
         multipleDropzonesItemsDraggingEnabled: false,
@@ -139,15 +167,26 @@ export default {
       }
     }
   },
-  // watch: {},
-  computed: {},
+  created () {
+    this.getStatusesWithUsers()
+  },
+  // watch: {
+  //   expectedReturnFormated: (val) => {
+  //     console.log(val)
+  //     const formHours = '01:00'.split(':')
+  //     const d = new Date()
+  //     const hours = (parseInt(d.getHours()) + parseInt(formHours[0]))
+  //     const minutes = (parseInt(d.getMinutes()) + parseInt(formHours[1]))
+  //     return hours + ':' + minutes
+  //   }
+  // },
   methods: {
     callDialog () {
       this.dialog = true
       this.statusWithReasons = []
       this.user.reason = {}
       this.user.note = ''
-      this.expectedReturnLabel = `${this.statusSelected.name} até`
+      this.expectedReturnLabel = `${this.statusSelected.name} até às`
       this.getStatuses(this.statusSelected)
     },
     changeStatus () {
@@ -177,44 +216,55 @@ export default {
       this.dialog = true
     },
     isUserLogged (event) {
-      if (event.detail.ids[0] === `${this.$globals.user.id}`) return true
+      if (event.detail.ids[0] === `${this.$globals.logged_user.id}`) return true
     },
     added (event, status) {
       if (!this.isUserLogged(event)) return
-      event.detail.index = 0
-      event.detail.ids = []
-      event.detail.ids[0] = `${this.$globals.user.id}`
-      this.statusSelected = status
-      this.callDialog()
 
-      status.users
-        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+      if (!this.process) {
+        event.detail.index = 0
+        event.detail.ids = []
+        event.detail.ids[0] = `${this.$globals.logged_user.id}`
+        this.evento = event
+        this.statusSelected = status
+        this.callDialog()
+        this.evento.preventDefault()
+      }
 
-      const newUsers = this.statusWithUsers.map((status) => status.users)
-        .reduce((prev, curr) => [...prev, ...curr], [])
-        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
-      status.users.splice(event.detail.index, 0, ...newUsers)
+      if (this.process) {
+        status.users
+          .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+
+        const newUsers = this.statusWithUsers.map((status) => status.users)
+          .reduce((prev, curr) => [...prev, ...curr], [])
+          .filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
+        status.users.splice(event.detail.index, 0, ...newUsers)
+
+        this.process = !this.process
+      }
     },
     removed (event, status) {
       if (!this.isUserLogged(event)) return
-      event.detail.ids = []
-      event.detail.ids[0] = `${this.$globals.user.id}`
 
-      status.users = status.users
-        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+      // this.statusOld = status
+      if (this.process) {
+        status.users
+          .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+      } else {
+        this.statusOld = status
+      }
     },
     reordered (event, status) {
       if (!this.isUserLogged(event)) return
-      event.detail.index = 0
-      event.detail.ids = []
-      event.detail.ids[0] = `${this.$globals.user.id}`
 
-      const reorderedUsers =
-        status.users.filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
-      const newUsers = status.users
-        .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
-      newUsers.splice(event.detail.index, 0, ...reorderedUsers)
-      status.users = newUsers
+      if (this.process) {
+        const reorderedUsers =
+          status.users.filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
+        const newUsers = status.users
+          .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
+        newUsers.splice(event.detail.index, 0, ...reorderedUsers)
+        status.users = newUsers
+      }
     },
     getStatusesWithUsers () {
       this.$axios.get('/status/users')
@@ -248,6 +298,9 @@ export default {
     tryChangeStatus (data) {
       this.$axios.post('/user-status', data)
         .then((response) => {
+          this.process = true
+          this.added(this.evento, this.statusSelected)
+          this.removed(this.evento, this.statusOld)
           this.$globals.myFunctions.refreshPage()
         })
         .catch((error) => {

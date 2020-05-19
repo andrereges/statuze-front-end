@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'LayoutAuth',
+  name: 'Auth',
 
   data () {
     return {}

@@ -1,20 +1,32 @@
 const routes = [
   {
     path: '/',
-    meta: {
-      requiresAuth: true
-    },
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue'), name: 'index' },
-      { path: '/profile', component: () => import('pages/Profile.vue'), name: 'profile' }
+      {
+        path: '',
+        name: 'home',
+        meta: { icon: 'home', title: 'Home' },
+        component: () => import('pages/home/Home.vue')
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        meta: { icon: 'home', title: 'Home' },
+        component: () => import('pages/home/Profile.vue')
+      }
     ]
   },
   {
     path: '/login',
     component: () => import('layouts/Auth.vue'),
     children: [
-      { path: '', component: () => import('pages/Login.vue'), name: 'login' }
+      {
+        path: '',
+        meta: { title: 'Login' },
+        name: 'login',
+        component: () => import('pages/login/Login.vue')
+      }
     ]
   }
 ]
@@ -23,6 +35,8 @@ const routes = [
 if (process.env.MODE !== 'ssr') {
   routes.push({
     path: '*',
+    name: 'error',
+    meta: { title: 'Error' },
     component: () => import('pages/Error404.vue')
   })
 }

@@ -65,7 +65,7 @@
             v-model="user.workSchedule"
             :options="workSchedules"
             :option-value="opt => Object(opt) === opt && 'id' in opt ? opt.id : null"
-            :option-label="opt => Object(opt) === opt && 'name' in opt ? opt.name : '- Null -'"
+            :option-label="opt => Object(opt) === opt && 'name' in opt ? `Das ${opt.begin} às ${opt.end}` : '- Null -'"
             label="Horário*"
             :rules="[
               val => !!val || 'Horário obrigatório'
@@ -100,7 +100,7 @@ export default {
     return {
       departments: this.getDepartments(),
       workSchedules: this.getWorkSchedules(),
-      user: this.$globals.user
+      user: this.$globals.logged_user
     }
   },
   methods: {
@@ -145,7 +145,8 @@ export default {
     tryUpdate (data) {
       this.$axios.post('/user/update', data)
         .then((response) => {
-          LocalStorage.set('statuze_logged_user', response.data.data)
+          LocalStorage.set('statuze_user', response.data.data)
+          this.$globals.myFunctions.refreshPage()
 
           Notify.create({
             message: response.data.message,
@@ -153,8 +154,6 @@ export default {
             color: 'green',
             icon: ''
           })
-
-          this.$globals.myFunctions.refreshPage()
         }).catch((error) => {
           Notify.create({
             message: error.message,
