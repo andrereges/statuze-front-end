@@ -1,4 +1,5 @@
 import { LocalStorage } from 'quasar'
+import moment from 'moment'
 
 const globals = {
   appName: 'Statuze App',
@@ -11,36 +12,21 @@ const globals = {
   },
   myFunctions: {
     refreshPage: () => window.location.reload(),
-    formatDateTime: (formHours) => {
-      if (!formHours) return
-
+    formatDateTime: (time) => {
+      const formHours = time.split(':')
       const d = new Date()
-      formHours = formHours.split(':')
+      d.setHours(parseInt(formHours[0]))
+      d.setMinutes(parseInt(formHours[1]))
 
-      const day = d.getDate()
-      const month = (d.getMonth() + 1)
-      const year = d.getFullYear()
-      const hours = formHours[0]
-      // const hours = (parseInt(d.getHours()) + parseInt(formHours[0]))
-      const minutes = formHours[1]
-      // const minutes = (parseInt(d.getMinutes()) + parseInt(formHours[1]))
-      const seconds = d.getSeconds()
+      return moment(d).format('YYYY-MM-DD HH:mm:ss')
+    },
+    createTime: (time) => {
+      const formHours = time.split(':')
+      const d = new Date()
+      d.setHours(parseInt(d.getHours()) + parseInt(formHours[0]))
+      d.setMinutes(parseInt(d.getMinutes()) + parseInt(formHours[1]))
 
-      const dt = new Date(year, month, day, hours, minutes, seconds)
-
-      const date = [
-        dt.getFullYear(),
-        dt.getMonth().toString().padStart(2, '0'),
-        dt.getDate().toString().padStart(2, '0')
-      ].join('-')
-
-      const hour = [
-        dt.getHours().toString().padStart(2, '0'),
-        dt.getMinutes().toString().padStart(2, '0'),
-        dt.getSeconds().toString().padStart(2, '0')
-      ].join(':')
-
-      return date + ' ' + hour
+      return moment(d).format('HH:mm')
     }
   }
 }

@@ -25,8 +25,8 @@
 
         <q-select
           outlined
-          v-model="user.reason"
-          ref="user.reason"
+          v-model="reason"
+          ref="reason"
           :options="statusWithReasons"
           :option-value="opt => Object(opt) === opt && 'id' in opt ? opt.id : ''"
           :option-label="opt => Object(opt) === opt && 'name' in opt ? opt.name : ''"
@@ -37,16 +37,18 @@
         </q-select>
 
         <q-input
-          ref="user.reason.expectedReturn"
+          ref="expectedReturn"
           :label="expectedReturnLabel"
           outlined
-          v-model="user.reason.expectedReturn"
-          mask="time">
+          v-model="expectedReturn"
+          mask="time"
+          :rules="['time']"
+          >
           <template v-slot:append>
             <q-icon name="access_time" class="cursor-pointer">
               <q-popup-proxy transition-show="scale" transition-hide="scale">
                 <q-time
-                  v-model="user.reason.expectedReturn"
+                  v-model="expectedReturn"
                   format24h
                 />
               </q-popup-proxy>
@@ -55,8 +57,8 @@
         </q-input>
 
         <q-input outlined
-          ref="user.note"
-          v-model="user.note"
+          ref="note"
+          v-model="note"
           label="Anotação"
           type="textarea"
           maxlength="255"
@@ -152,10 +154,10 @@ export default {
       statusOld: '',
       statusSelected: '',
       evento: null,
-      user: {
-        reason: {},
-        note: ''
-      },
+      user: '',
+      reason: '',
+      expectedReturn: '',
+      note: '',
       process: false,
       dialog: false,
       options: {
@@ -170,34 +172,39 @@ export default {
   created () {
     this.getStatusesWithUsers()
   },
-  // watch: {
-  //   expectedReturnFormated: (val) => {
-  //     console.log(val)
-  //     const formHours = '01:00'.split(':')
-  //     const d = new Date()
-  //     const hours = (parseInt(d.getHours()) + parseInt(formHours[0]))
-  //     const minutes = (parseInt(d.getMinutes()) + parseInt(formHours[1]))
-  //     return hours + ':' + minutes
-  //   }
-  // },
+  watch: {
+    reason: function (newReason) {
+      this.expectedReturn = ''
+
+      if (newReason.expectedReturn) {
+        this.expectedReturn = this.$globals.myFunctions
+          .createTime(newReason.expectedReturn)
+      }
+    }
+  },
   methods: {
     callDialog () {
       this.dialog = true
       this.statusWithReasons = []
-      this.user.reason = {}
-      this.user.note = ''
+      this.user = ''
+      this.reason = ''
+      this.expectedReturn = ''
+      this.note = ''
       this.expectedReturnLabel = `${this.statusSelected.name} até às`
       this.getStatuses(this.statusSelected)
     },
     changeStatus () {
-      const dateTime = this.$globals.myFunctions
-        .formatDateTime(this.user.reason.expectedReturn)
+      let dateTime = ''
+      if (this.expectedReturn) {
+        dateTime = this.$globals.myFunctions
+          .formatDateTime(this.expectedReturn)
+      }
 
       const data = {
         status: this.statusSelected.id,
-        reason: this.user.reason.id,
+        reason: this.reason.id,
         to: dateTime,
-        note: this.user.note
+        note: this.note
       }
 
       if (data.status && data.reason) {
@@ -246,12 +253,11 @@ export default {
     removed (event, status) {
       if (!this.isUserLogged(event)) return
 
-      // this.statusOld = status
+      this.statusOld = status
+
       if (this.process) {
         status.users
           .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
-      } else {
-        this.statusOld = status
       }
     },
     reordered (event, status) {
