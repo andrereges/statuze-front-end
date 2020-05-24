@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex flex-center" id="login">
     <q-card style="width: 350px">
 
       <q-bar class="bg-black glossy unelevated text-white">
@@ -99,14 +99,14 @@ export default {
           LocalStorage.set('statuze_user', response.data.logged_user)
           LocalStorage.set('statuze_access_token', response.data.access_token)
           LocalStorage.set('statuze_token_expires_in', response.data.expires_in)
-          this.$router.push({ name: 'home' })
+          this.$globals.refreshPage()
         })
         .catch((error) => {
           Notify.create({
             message: error.message,
             position: 'top',
             color: 'red',
-            icon: 'error_outline'
+            icon: 'thumb_down'
           })
         })
     }
@@ -121,3 +121,10 @@ export default {
 }
 
 </script>
+
+<style>
+#login {
+  background-color: #444;
+  height: 100vh;
+}
+</style>

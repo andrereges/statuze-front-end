@@ -8,13 +8,16 @@
             flat
             dense
             round
+            size="18px"
             @click="index"
           >
             <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              <img src="../assets/logo.png">
             </q-avatar>
 
-            {{ this.$globals.appName }}
+            <q-item-label style="padding-left: 10px; font-size: 28px">
+              {{ this.$globals.appName }}
+            </q-item-label>
 
             <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
               Início
@@ -28,7 +31,8 @@
           dense
           round
           @click="profile"
-          arial-label="Profile">
+          style="padding-right: 15px"
+        >
           <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
             Perfil
           </q-tooltip>
@@ -58,7 +62,7 @@
             Sair
           </q-tooltip>
 
-          <q-icon name="exit_to_app"></q-icon>
+          <q-icon size="42px" name="exit_to_app"></q-icon>
 
         </q-btn>
 
@@ -67,6 +71,14 @@
 
     <q-page-container>
       <router-view />
+        <q-page-sticky position="bottom-right" :offset="[18, 18]">
+          <q-btn
+            fab
+            icon="refresh"
+            class="zoom glossy bg-amber text-black shadow-4"
+            @click="refreshPage()"
+          />
+        </q-page-sticky>
     </q-page-container>
   </q-layout>
 </template>
@@ -109,6 +121,9 @@ export default {
     },
     index () {
       this.$router.push('/')
+    },
+    refreshPage () {
+      this.$globals.refreshPage()
     }
   }
 }

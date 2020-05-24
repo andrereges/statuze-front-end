@@ -12,7 +12,7 @@ const routes = [
       {
         path: '/profile',
         name: 'profile',
-        meta: { icon: 'home', title: 'Home' },
+        meta: { title: 'Perfil' },
         component: () => import('pages/home/Profile.vue')
       }
     ]

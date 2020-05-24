@@ -1,21 +1,46 @@
 <template>
-  <q-page class="q-pa-md row">
-    <div class="col-md-6 offset-md-3">
-      <q-bar class="bg-black glossy unelevated text-white">Perfil</q-bar>
+<div class="q-pa-md row justify-center">
+  <q-form
+    @submit.prevent="onSubmit()"
+    class="q-gutter-md">
 
-      <q-card class="q-pa-md">
+    <q-layout class="layout">
+      <q-bar class="bg-black glossy unelevated text-white text-center">
+        <q-toolbar-title>INFORMAÇÕES</q-toolbar-title>
+      </q-bar>
 
-        <q-card-section class="text-center">
-          <q-uploader
-            url=""
-            field-name="image"
-            label="Foto de Perfil"
-            color="black"
-            accept="image/*"
-          />
-        </q-card-section>
+      <q-tabs
+        v-model="tab"
+        align="justify"
+        narrow-indicator
+        class="q-mb-lg">
 
-        <q-card-section>
+        <q-tab name="pessoais" label="Pessoais" />
+        <q-tab name="profissionais" label="Profissionais" />
+        <q-tab name="seguranca" label="Segurança" />
+        <q-tab name="configuracoes" label="Configurações" />
+
+      </q-tabs>
+
+      <q-tab-panels
+          v-model="tab"
+          animated
+          transition-prev="scale"
+          transition-next="scale"
+          class="text-center"
+        >
+
+        <q-tab-panel name="pessoais">
+          <div class="div-uploader row justify-center">
+            <q-uploader
+              ref="image"
+              url=""
+              label="Foto de Perfil"
+              color="black"
+              accept="image/*"
+            />
+          </div>
+
           <q-input outlined
             ref="name"
             v-model="user.name"
@@ -24,18 +49,24 @@
             hint=""
             :rules="[
               val => !!val || 'Nome obrigatório'
-            ]" />
+            ]">
+
+            <template v-slot:prepend>
+              <q-icon name="subject" />
+            </template>
+          </q-input>
 
           <q-input outlined
             ref="email"
+            type="email"
             v-model="user.email"
             label="Email*"
-            placeholder=""
-            hint=""
-            :rules="[
-              val => !!val || 'Email obrigatório',
-              val => this.validateEmail(val) || 'Formato de email inválido'
-            ]" />
+            hint="">
+
+            <template v-slot:prepend>
+              <q-icon name="mail" />
+            </template>
+          </q-input>
 
           <q-input outlined
             ref="birth"
@@ -46,8 +77,14 @@
             :rules="[
               val => !!val || 'Data de nascimento obrigatória'
             ]"
-          />
+          >
 
+            <template v-slot:prepend>
+              <q-icon name="today" />
+            </template>
+          </q-input>
+        </q-tab-panel>
+        <q-tab-panel name="profissionais">
           <q-select
             outlined
             v-model="user.department"
@@ -58,6 +95,10 @@
             :rules="[
               val => !!val || 'Departamento obrigatório'
             ]">
+
+            <template v-slot:prepend>
+              <q-icon name="work" />
+            </template>
           </q-select>
 
           <q-select
@@ -70,34 +111,74 @@
             :rules="[
               val => !!val || 'Horário obrigatório'
             ]">
-          </q-select>
-        </q-card-section>
 
-        <q-card-section>
-          <q-btn
-            glossy unelevated
-            push
-            color="primary"
-            text-color="black"
-            label="Atualizar"
-            class="full-width"
-            size="lg"
-            @click="update"
-          />
-        </q-card-section>
-      </q-card>
-    </div>
-  </q-page>
+            <template v-slot:prepend>
+              <q-icon name="schedule" />
+            </template>
+          </q-select>
+        </q-tab-panel>
+
+        <q-tab-panel name="seguranca">
+
+          <q-input outlined
+            ref="password"
+            v-model="password"
+            label="Nova senha*"
+            type="password"
+            placeholder=""
+            hint=""
+            :rules="[val => !!val || 'Senha obrigatória']"
+          >
+
+            <template v-slot:prepend>
+              <q-icon name="vpn_key" />
+            </template>
+          </q-input>
+
+          <q-input outlined
+            ref="password"
+            v-model="password"
+            label="Confirmar senha*"
+            type="password"
+            placeholder=""
+            hint=""
+            :rules="[val => !!val || 'Senha obrigatória']"
+          >
+
+            <template v-slot:prepend>
+              <q-icon name="vpn_key" />
+            </template>
+          </q-input>
+
+        </q-tab-panel>
+      </q-tab-panels>
+      <div class= "div-btn">
+        <q-btn
+          type="submit"
+          glossy
+          color="primary"
+          text-color="black"
+          class="full-width"
+          size="lg"
+        >
+          <q-icon size="32px" name="edit" class="text-black" />
+          Alterar
+        </q-btn>
+      </div>
+    </q-layout>
+  </q-form>
+</div>
 </template>
 
 <script>
 import { Notify, LocalStorage } from 'quasar'
 
 export default {
-  name: 'PageProfile',
+  name: 'Profile',
 
   data () {
     return {
+      tab: 'pessoais',
       departments: this.getDepartments(),
       workSchedules: this.getWorkSchedules(),
       user: this.$globals.logged_user
@@ -120,46 +201,35 @@ export default {
           }
         })
     },
-    // upload () {
-    //   this.$axios.post('/user/upload')
-    //     .catch((error) => {
-    //       Notify.create({
-    //         message: error.message,
-    //         position: 'top',
-    //         color: 'red',
-    //         icon: 'error_outline'
-    //       })
-    //     })
-    // },
-    update () {
-      const data = {
-        name: this.user.name,
-        email: this.user.email,
-        birth: this.user.birth,
-        department: this.user.department.id,
-        work_schedule: this.user.workSchedule.id
-      }
+    onSubmit () {
+      const formData = new FormData()
+      formData.append('name', this.user.name)
+      formData.append('email', this.user.email)
+      formData.append('birth', this.user.birth)
+      formData.append('department', this.user.department.id)
+      formData.append('work_schedule', this.user.workSchedule.id)
+      formData.append('image', this.$refs.image.files[0])
 
-      this.tryUpdate(data)
+      this.tryUpdate(formData)
     },
     tryUpdate (data) {
       this.$axios.post('/user/update', data)
         .then((response) => {
           LocalStorage.set('statuze_user', response.data.data)
-          this.$globals.myFunctions.refreshPage()
+          this.$router.push({ name: 'home' })
 
           Notify.create({
             message: response.data.message,
             position: 'top',
             color: 'green',
-            icon: ''
+            icon: 'thumb_up'
           })
         }).catch((error) => {
           Notify.create({
             message: error.message,
             position: 'top',
             color: 'red',
-            icon: 'error_outline'
+            icon: 'thumb_down'
           })
         })
     }
@@ -167,3 +237,15 @@ export default {
 }
 
 </script>
+<style scoped>
+.div-btn {
+  padding: 0 15px 0 15px;
+}
+.div-uploader {
+  padding: 0 0 20px 0;
+}
+.layout {
+  width: 90vw;
+  background-color: #FFF;
+}
+</style>
