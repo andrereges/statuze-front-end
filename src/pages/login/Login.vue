@@ -27,7 +27,12 @@
           :rules="[
             val => !!val || 'Email obrigatório',
             val => this.validateEmail(val) || 'Formato de email inválido'
-          ]" />
+          ]">
+
+          <template v-slot:prepend>
+            <q-icon name="mail" />
+          </template>
+        </q-input>
       </q-card-section>
 
       <q-card-section>
@@ -38,7 +43,13 @@
           type="password"
           placeholder=""
           hint=""
-          :rules="[val => !!val || 'Senha obrigatória']" />
+          :rules="[val => !!val || 'Senha obrigatória']"
+        >
+
+          <template v-slot:prepend>
+            <q-icon name="vpn_key" />
+          </template>
+        </q-input>
       </q-card-section>
 
       <q-card-section>
@@ -47,11 +58,13 @@
           push
           color="primary"
           text-color="black"
-          label="Entrar"
           class="full-width"
           size="lg"
           @click="login"
-        />
+        >
+          <q-icon size="32px" name="input" class="text-black" />
+          Entrar
+        </q-btn>
       </q-card-section>
 
     </q-card>
@@ -67,7 +80,7 @@ export default {
 
   data () {
     return {
-      email: 'asantos@lliege.com.br',
+      email: 'username@lliege.com.br',
       password: 'change123'
     }
   },

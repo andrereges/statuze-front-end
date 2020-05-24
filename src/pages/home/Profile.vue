@@ -6,6 +6,14 @@
 
     <q-layout class="layout">
       <q-bar class="bg-black glossy unelevated text-white text-center">
+        <q-btn
+          @click="goBack()"
+        >
+          <q-icon name="reply" class="text-white" />
+          <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
+            Voltar
+          </q-tooltip>
+        </q-btn>
         <q-toolbar-title>INFORMAÇÕES</q-toolbar-title>
       </q-bar>
 
@@ -15,10 +23,22 @@
         narrow-indicator
         class="q-mb-lg">
 
-        <q-tab name="pessoais" label="Pessoais" />
-        <q-tab name="profissionais" label="Profissionais" />
-        <q-tab name="seguranca" label="Segurança" />
-        <q-tab name="configuracoes" label="Configurações" />
+        <q-tab name="pessoais">
+          <q-icon size="32px" name="account_box" class="text-back" />
+          <q-item-label>Pessoais</q-item-label>
+        </q-tab>
+        <q-tab name="profissionais">
+          <q-icon size="32px" name="work" class="text-back" />
+          <q-item-label>Profissionais</q-item-label>
+        </q-tab>
+        <q-tab name="seguranca">
+          <q-icon size="32px" name="security" class="text-back" />
+          <q-item-label>Segurança</q-item-label>
+        </q-tab>
+        <q-tab name="configuracoes">
+          <q-icon size="32px" name="settings" class="text-back" />
+          <q-item-label>Configurações</q-item-label>
+        </q-tab>
 
       </q-tabs>
 
@@ -52,7 +72,7 @@
             ]">
 
             <template v-slot:prepend>
-              <q-icon name="subject" />
+              <q-icon name="spellcheck" />
             </template>
           </q-input>
 
@@ -154,8 +174,10 @@
       </q-tab-panels>
       <div class= "div-btn">
         <q-btn
-          type="submit"
           glossy
+          unelevated
+          push
+          type="submit"
           color="primary"
           text-color="black"
           class="full-width"
@@ -232,6 +254,9 @@ export default {
             icon: 'thumb_down'
           })
         })
+    },
+    goBack () {
+      this.$router.back()
     }
   }
 }

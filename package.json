@@ -16,6 +16,7 @@
     "axios": "^0.19.2",
     "moment": "^2.25.3",
     "quasar": "^1.0.0",
+    "quasar-dotenv": "^1.0.5",
     "validator": "^13.0.0",
     "vue-draggable": "^2.0.6"
   },

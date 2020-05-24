@@ -2,8 +2,7 @@ import axios from 'axios'
 import { LocalStorage } from 'quasar'
 
 const axiosInstance = axios.create({
-  baseURL: 'http://statuze.local/api',
-  // baseURL: 'http://10.0.0.34/api',
+  baseURL: process.env.API,
   timeout: 30000,
   headers: {
     Accept: 'application/json',

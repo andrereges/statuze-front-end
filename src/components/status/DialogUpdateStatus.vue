@@ -33,50 +33,54 @@
               class="q-gutter-md">
 
               <q-select
+                ref="reason"
+                required
                 outlined
                 v-model="reason"
-                ref="reason"
                 :options="statusWithReasons"
                 :option-value="opt => Object(opt) === opt && 'id' in opt ? opt.id : ''"
                 :option-label="opt => Object(opt) === opt && 'name' in opt ? opt.name : ''"
                 label="Motivo*"
-                :rules="[
-                  val => !!val || 'Motivo obrigatório'
-                ]">
+              >
+
+                <template v-slot:prepend>
+                  <q-icon name="short_text" />
+                </template>
               </q-select>
 
               <q-input
-                ref="expectedReturn"
+                ref="expected_return"
+                type="time"
                 :label="expectedReturnLabel"
                 outlined
                 v-model="expectedReturn"
-                mask="time"
-                :rules="[]"
                 >
-                <template v-slot:append>
-                  <q-icon name="access_time" class="cursor-pointer">
-                    <q-popup-proxy transition-show="scale" transition-hide="scale">
-                      <q-time
-                        v-model="expectedReturn"
-                        format24h
-                      />
-                    </q-popup-proxy>
-                  </q-icon>
+                <template v-slot:prepend>
+                  <q-icon name="access_time" />
                 </template>
               </q-input>
 
               <q-input outlined
                 ref="note"
+                :required="isNoteRequired"
                 v-model="note"
                 label="Anotação"
                 type="textarea"
                 maxlength="100"
-                :hint="note.length + ' de 100'" />
+                :hint="note.length + ' de 100'"
+              >
+
+                <template v-slot:prepend>
+                  <q-icon name="view_headline" />
+                </template>
+              </q-input>
 
               <div class= "div-btn">
                 <q-btn
-                  type="submit"
                   glossy
+                  unelevated
+                  push
+                  type="submit"
                   color="primary"
                   text-color="black"
                   class="full-width"
@@ -109,7 +113,8 @@ export default {
       reason: '',
       expectedReturn: '',
       note: '',
-      dialog: false
+      dialog: false,
+      isNoteRequired: false
     }
   },
   watch: {
@@ -117,6 +122,11 @@ export default {
       if (newValue.expectedReturn) {
         this.expectedReturn = this.$globals
           .createTime(newValue.expectedReturn)
+      }
+
+      this.isNoteRequired = false
+      if (newValue.name.toUpperCase() === 'OUTROS') {
+        this.isNoteRequired = true
       }
     }
   },
@@ -148,8 +158,20 @@ export default {
           }
         })
     },
+    hasErrorInForm (data) {
+      if (!data.status && !data.reason) {
+        return 'O informe os campos obrigatórios'
+      }
+
+      if (this.expectedReturn <= this.$globals.getTime()) {
+        return 'A hora prevista do status deve ser maior que a atual.'
+      }
+
+      return false
+    },
     onSubmit () {
       let dateTime = ''
+
       if (this.expectedReturn) {
         dateTime = this.$globals
           .formatDateTime(this.expectedReturn)
@@ -162,16 +184,17 @@ export default {
         note: this.note
       }
 
-      if (data.status && data.reason) {
-        this.tryChangeStatus(data)
-        this.dialog = false
-      } else {
+      const error = this.hasErrorInForm(data)
+      if (error) {
         Notify.create({
-          message: 'O informe os campos obrigatórios',
+          message: error,
           position: 'top',
           color: 'red',
           icon: 'thumb_down'
         })
+      } else {
+        this.tryChangeStatus(data)
+        this.dialog = false
       }
     },
     tryChangeStatus (data) {
@@ -179,6 +202,7 @@ export default {
         .then((response) => {
           this.$root.$emit('ListStatus::added', this.statusNew)
           this.$root.$emit('ListStatus::removed', this.statusOld)
+          this.$globals.refreshPage()
         }).catch((error) => {
           Notify.create({
             message: error,
@@ -189,6 +213,8 @@ export default {
         })
     },
     cleanFields () {
+      this.statusNew = ''
+      this.statusOld = ''
       this.statusWithReasons = []
       this.note = ''
       this.reason = ' '

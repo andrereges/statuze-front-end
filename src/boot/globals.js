@@ -2,8 +2,8 @@ import { LocalStorage } from 'quasar'
 import moment from 'moment'
 
 const globals = {
-  appName: 'Statuze',
-  version: '1.0.0',
+  appName: process.env.APP_NAME,
+  version: process.env.VERSION,
   isLogged: (new Date() >= LocalStorage.getItem('statuze_token_expires_in')),
   logged_user: LocalStorage.getItem('statuze_user'),
   token_info: {
@@ -41,7 +41,11 @@ const globals = {
     return moment(d).format('HH:mm')
   },
   getTime: (dateTime) => {
-    return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')
+    if (dateTime) {
+      return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')
+    }
+
+    return moment().format('HH:mm')
   },
   getTimeOrDateTime: (dateTime) => {
     if (moment(dateTime, 'DDMMYYYY').format('DDMMYYYY') !== moment().format('DDMMYYYY')) {

@@ -58,6 +58,7 @@ export default {
     })
 
     this.$root.$on('ListStatus::removed', (statusOld) => {
+      this.statusChanged = true
       this.removed(this.evento, statusOld)
     })
   },

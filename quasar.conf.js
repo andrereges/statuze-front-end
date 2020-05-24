@@ -1,5 +1,6 @@
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
+const env = require('quasar-dotenv').config()
 
 module.exports = function (ctx) {
   return {
@@ -67,8 +68,8 @@ module.exports = function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
-
+      vueRouterMode: 'history', // available values: 'hash', 'history'
+      env: env,
       // showProgress: false,
       // gzip: true,
       // analyze: true,
@@ -112,9 +113,9 @@ module.exports = function (ctx) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'Statuze App',
-        short_name: 'Statuze App',
-        description: 'A Quasar Framework app',
+        name: 'Statuze',
+        short_name: 'Statuze',
+        description: 'App to manage status',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
