@@ -163,7 +163,7 @@ export default {
         return 'O informe os campos obrigatórios'
       }
 
-      if (this.expectedReturn <= this.$globals.getTime()) {
+      if (this.expectedReturn && this.expectedReturn <= this.$globals.getTime()) {
         return 'A hora prevista do status deve ser maior que a atual.'
       }
 
