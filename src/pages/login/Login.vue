@@ -61,9 +61,16 @@
           class="full-width"
           size="lg"
           @click="login"
+          :disabled="loading"
         >
-          <q-icon size="32px" name="input" class="text-black" />
-          Entrar
+          <template v-if="loading">
+            <q-icon size="32px" name="sync" class="text-black" />
+            Entrando...
+          </template>
+          <template v-else>
+            <q-icon size="32px" name="input" class="text-black" />
+            Entrar
+          </template>
         </q-btn>
       </q-card-section>
 
@@ -81,7 +88,8 @@ export default {
   data () {
     return {
       email: 'username@lliege.com.br',
-      password: 'change123'
+      password: 'change123',
+      loading: false
     }
   },
   methods: {
@@ -106,8 +114,10 @@ export default {
         this.tryAuth(data)
       }
     },
-    tryAuth (payload) {
-      this.$axios.post('/auth/login', payload)
+    async tryAuth (payload) {
+      this.loading = true
+
+      await this.$axios.post('/auth/login', payload)
         .then((response) => {
           LocalStorage.set('statuze_user', response.data.logged_user)
           LocalStorage.set('statuze_access_token', response.data.access_token)
@@ -122,6 +132,8 @@ export default {
             icon: 'thumb_down'
           })
         })
+
+      this.loading = false
     }
   },
   beforeRouteEnter (to, from, next) {
