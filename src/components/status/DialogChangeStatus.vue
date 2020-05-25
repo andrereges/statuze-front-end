@@ -124,6 +124,7 @@ export default {
           .createTime(newValue.expectedReturn)
       }
 
+      this.isNoteRequired = false
       if (newValue.name.toUpperCase() === 'OUTROS') {
         this.isNoteRequired = true
       }
@@ -133,6 +134,11 @@ export default {
     this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld) => {
       this.statusNew = statusNew
       this.statusOld = statusOld
+
+      if (statusNew.name === 'Disponível') {
+        this.reason = { id: 9, name: 'Fale Comigo' }
+      }
+
       this.getStatuses()
       this.expectedReturnLabel = `${this.statusNew.name} até às`
       this.dialog = true
@@ -154,7 +160,7 @@ export default {
         })
     },
     hasErrorInForm (data) {
-      if (!data.status && !data.reason) {
+      if (!data.status || !data.reason || typeof (data.reason) === 'undefined') {
         return 'O informe os campos obrigatórios'
       }
 
@@ -187,6 +193,7 @@ export default {
           icon: 'thumb_down'
         })
       } else {
+        console.log(data)
         this.tryChangeStatus(data)
         this.dialog = false
       }
@@ -220,7 +227,7 @@ export default {
 <style scoped>
 .dialog {
   width: 350px;
-  height: 500px;
+  height: 460px;
   overflow: hidden;
   background-color: transparent;
 }

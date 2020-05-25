@@ -135,7 +135,7 @@ export default {
       this.statusNew = this.statusOld = user.user_status.status
       this.statusWithReasons = []
       this.reason = user.user_status.reason
-      this.expectedReturn = this.$globals.getTime(user.user_status.to)
+      this.expectedReturn = user.user_status.to ? this.$globals.getTime(user.user_status.to) : ''
       this.note = user.user_status.note ? user.user_status.note : ''
       this.expectedReturnLabel = `${user.user_status.status.name} até às`
 
@@ -159,7 +159,7 @@ export default {
         })
     },
     hasErrorInForm (data) {
-      if (!data.status && !data.reason) {
+      if (!data.status || !data.reason || typeof (data.reason) === 'undefined') {
         return 'O informe os campos obrigatórios'
       }
 
@@ -227,7 +227,7 @@ export default {
 <style scoped>
 .dialog {
   width: 350px;
-  height: 500px;
+  height: 460px;
   overflow: hidden;
   background-color: transparent;
 }
