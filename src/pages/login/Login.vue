@@ -3,7 +3,7 @@
     <q-card style="width: 350px">
 
       <q-bar class="bg-black glossy unelevated text-white">
-        <q-label>Autenticação</q-label>
+        <q-item-label>Autenticação</q-item-label>
 
         <q-space />
 
@@ -87,7 +87,7 @@ export default {
 
   data () {
     return {
-      email: 'username@lliege.com.br',
+      email: 'USERNAME@lliege.com.br',
       password: 'change123',
       loading: false
     }

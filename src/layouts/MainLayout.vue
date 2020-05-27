@@ -104,9 +104,7 @@ export default {
   },
   methods: {
     logout () {
-      LocalStorage.remove('statuze_user')
-      LocalStorage.remove('statuze_access_token')
-      LocalStorage.remove('statuze_token_expires_in')
+      LocalStorage.getAllKeys().forEach(key => LocalStorage.remove(key))
 
       this.$axios.post('/auth/logout')
         .then(() => {

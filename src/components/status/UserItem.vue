@@ -34,7 +34,7 @@ export default {
     updateStatus (user) {
       if (user.id !== this.$globals.logged_user.id) return
       this.statusNew = this.statusOld = user.user_status.status
-      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld, user)
+      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld)
     }
   }
 }

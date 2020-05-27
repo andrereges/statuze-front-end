@@ -150,17 +150,11 @@ export default {
     }
   },
   created () {
-    this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld, user) => {
+    this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld) => {
       this.statusNew = statusNew
       this.statusOld = statusOld
       this.expectedReturnLabel = `${this.statusNew.name} até às`
       this.getStatuses()
-
-      if (user) {
-        this.reason = user.user_status.reason
-        this.expectedReturn = user.user_status.to ? this.$globals.getTime(user.user_status.to) : ''
-        this.note = user.user_status.note
-      }
 
       if (statusNew.name === 'Disponível') {
         this.reason = { id: 9, name: 'Fale Comigo' }
