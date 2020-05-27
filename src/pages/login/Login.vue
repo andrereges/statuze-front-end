@@ -80,7 +80,7 @@
 
 <script>
 import isEmail from 'validator/lib/isEmail'
-import { Notify, LocalStorage } from 'quasar'
+import { LocalStorage } from 'quasar'
 
 export default {
   name: 'Login',
@@ -125,12 +125,7 @@ export default {
           this.$globals.refreshPage()
         })
         .catch((error) => {
-          Notify.create({
-            message: error.message,
-            position: 'top',
-            color: 'red',
-            icon: 'thumb_down'
-          })
+          this.$globals.showNotify('error', error.message)
         })
 
       this.loading = false

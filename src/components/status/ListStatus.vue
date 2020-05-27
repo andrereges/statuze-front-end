@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import { Notify } from 'quasar'
 import UserItem from '../../components/status/UserItem'
 import ListStatusToolbar from '../../components/status/ListStatusToolbar'
 
@@ -64,7 +63,7 @@ export default {
   },
   methods: {
     callDialog () {
-      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld)
+      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld, null)
     },
     isUserLogged (event, status) {
       if (event.detail.ids[0] !== `${this.$globals.logged_user.id}`) return
@@ -125,12 +124,7 @@ export default {
             this.statusWithUsers = response.data.data
           }
         }).catch((error) => {
-          Notify.create({
-            message: error.message,
-            position: 'top',
-            color: 'red',
-            icon: 'thumb_down'
-          })
+          this.$globals.showNotify('error', error.message)
         })
     }
   }

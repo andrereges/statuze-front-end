@@ -67,9 +67,27 @@
                 label="Anotação"
                 type="textarea"
                 maxlength="100"
-                :hint="note.length + ' de 100'"
+                :hint="note ? note.length + ' de 100' : '0 de 100'"
               >
-
+                <template v-slot:append>
+                  <q-toggle
+                    glossy
+                    unelevated
+                    v-model="rememberNote"
+                    checked-icon="check"
+                    color="primary"
+                    unchecked-icon="clear"
+                  >
+                    <q-tooltip
+                      content-class="bg-indigo"
+                      content-style="font-size: 16px"
+                      :offset="[10, 10]"
+                      sta
+                    >
+                      Lembrar
+                    </q-tooltip>
+                  </q-toggle>
+                </template>
                 <template v-slot:prepend>
                   <q-icon name="view_headline" />
                 </template>
@@ -100,7 +118,7 @@
 </template>
 
 <script>
-import { Notify } from 'quasar'
+import { LocalStorage } from 'quasar'
 
 export default {
   name: 'DialogChangeStatus',
@@ -114,7 +132,8 @@ export default {
       expectedReturn: '',
       note: '',
       dialog: false,
-      isNoteRequired: false
+      isNoteRequired: false,
+      rememberNote: false
     }
   },
   watch: {
@@ -125,22 +144,33 @@ export default {
       }
 
       this.isNoteRequired = false
-      if (newValue.name.toUpperCase() === 'OUTROS') {
+      if (newValue.name && newValue.name.toUpperCase() === 'OUTROS') {
         this.isNoteRequired = true
       }
     }
   },
   created () {
-    this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld) => {
+    this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld, user) => {
       this.statusNew = statusNew
       this.statusOld = statusOld
+      this.expectedReturnLabel = `${this.statusNew.name} até às`
+      this.getStatuses()
+
+      if (user) {
+        this.reason = user.user_status.reason
+        this.expectedReturn = user.user_status.to ? this.$globals.getTime(user.user_status.to) : ''
+        this.note = user.user_status.note
+      }
 
       if (statusNew.name === 'Disponível') {
         this.reason = { id: 9, name: 'Fale Comigo' }
       }
 
-      this.getStatuses()
-      this.expectedReturnLabel = `${this.statusNew.name} até às`
+      if (LocalStorage.getItem(`statuze_status_${this.statusNew.id}`)) {
+        this.note = LocalStorage.getItem(`statuze_status_${this.statusNew.id}`)
+        this.rememberNote = true
+      }
+
       this.dialog = true
     })
   },
@@ -171,31 +201,25 @@ export default {
       return false
     },
     onSubmit () {
-      let dateTime = ''
-      if (this.expectedReturn) {
-        dateTime = this.$globals
-          .formatDateTime(this.expectedReturn)
-      }
-
       const data = {
         status: this.statusNew.id,
         reason: this.reason.id,
-        to: dateTime,
+        to: this.expectedReturn ? this.$globals.formatDateTime(this.expectedReturn) : '',
         note: this.note
       }
 
-      const error = this.hasErrorInForm(data)
-      if (error) {
-        Notify.create({
-          message: error,
-          position: 'top',
-          color: 'red',
-          icon: 'thumb_down'
-        })
+      const errorMessage = this.hasErrorInForm(data)
+      if (errorMessage) {
+        this.$globals.showNotify('error', errorMessage)
       } else {
-        console.log(data)
-        this.tryChangeStatus(data)
+        if (this.rememberNote) {
+          LocalStorage.set(`statuze_status_${this.statusNew.id}`, data.note)
+        } else {
+          LocalStorage.set(`statuze_status_${this.statusNew.id}`, '')
+        }
+
         this.dialog = false
+        this.tryChangeStatus(data)
       }
     },
     tryChangeStatus (data) {
@@ -206,12 +230,7 @@ export default {
           this.$globals.refreshPage()
         })
         .catch((error) => {
-          Notify.create({
-            message: error.message,
-            position: 'top',
-            color: 'red',
-            icon: 'thumb_down'
-          })
+          this.$globals.showNotify('error', error.message)
         })
     },
     cleanFields () {
@@ -220,6 +239,7 @@ export default {
       this.reason = ''
       this.expectedReturn = ''
       this.expectedReturnLabel = ''
+      this.rememberNote = false
     }
   }
 }

@@ -193,7 +193,7 @@
 </template>
 
 <script>
-import { Notify, LocalStorage } from 'quasar'
+import { LocalStorage } from 'quasar'
 
 export default {
   name: 'Profile',
@@ -239,20 +239,9 @@ export default {
         .then((response) => {
           LocalStorage.set('statuze_user', response.data.data)
           this.$router.push({ name: 'home' })
-
-          Notify.create({
-            message: response.data.message,
-            position: 'top',
-            color: 'green',
-            icon: 'thumb_up'
-          })
+          this.$globals.showNotify('success', response.data.message)
         }).catch((error) => {
-          Notify.create({
-            message: error.message,
-            position: 'top',
-            color: 'red',
-            icon: 'thumb_down'
-          })
+          this.$globals.showNotify('error', error.message)
         })
     },
     goBack () {

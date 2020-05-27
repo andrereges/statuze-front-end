@@ -1,4 +1,4 @@
-import { LocalStorage } from 'quasar'
+import { LocalStorage, Notify } from 'quasar'
 import moment from 'moment'
 
 const globals = {
@@ -9,6 +9,14 @@ const globals = {
   token_info: {
     token: LocalStorage.getItem('statuze_access_token'),
     expires_in: LocalStorage.getItem('statuze_token_expires_in')
+  },
+  showNotify: (type, message) => {
+    Notify.create({
+      message: message,
+      position: 'top',
+      color: (type === 'success') ? 'green' : 'red',
+      icon: (type === 'success') ? 'thumb_up' : 'thumb_down'
+    })
   },
   userLoggedHasRoles: (userLoggedRoles, roles) => {
     let hasPermission = false
