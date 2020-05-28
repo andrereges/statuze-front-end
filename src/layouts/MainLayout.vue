@@ -3,6 +3,10 @@
     <q-header elevated>
       <q-toolbar class="bg-black glossy text-white">
 
+        <q-btn flat @click="drawer = !drawer" round dense :icon="iconMenu" />
+
+        <menu-left :drawer="drawer" :user="loggedUser"/>
+
         <q-toolbar-title>
           <q-btn
             flat
@@ -20,51 +24,10 @@
             </q-item-label>
 
             <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
-              Início
+              Home
             </q-tooltip>
           </q-btn>
         </q-toolbar-title>
-
-        <q-btn
-          push
-          flat
-          dense
-          round
-          @click="profile"
-          style="padding-right: 15px"
-        >
-          <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
-            Perfil
-          </q-tooltip>
-
-          <div class="container text-center">
-            <div class="row justify-center">
-              <q-avatar size="42px">
-                <img :src="loggedUser.image">
-              </q-avatar>
-            </div>
-            <div class="row">
-              {{ loggedUser.nickName }}
-            </div>
-          </div>
-
-        </q-btn>
-
-        <q-btn
-          push
-          flat
-          dense
-          round
-          @click="logout"
-          arial-label="Logout">
-
-          <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
-            Sair
-          </q-tooltip>
-
-          <q-icon size="42px" name="exit_to_app"></q-icon>
-
-        </q-btn>
 
       </q-toolbar>
     </q-header>
@@ -74,7 +37,7 @@
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
           <q-btn
             fab
-            icon="refresh"
+            icon="sync"
             class="zoom glossy bg-amber text-black shadow-4"
             @click="refreshPage()"
           />
@@ -84,13 +47,30 @@
 </template>
 
 <script>
-import { LocalStorage } from 'quasar'
+import MenuLeft from '../components/global/MenuLeft'
 
 export default {
   name: 'MainLayout',
+  components: {
+    MenuLeft
+  },
+  beforeUpdate () {
+    this.$root.$on('MenuLeft::close', () => {
+      this.drawer = false
+    })
+  },
+  computed: {
+    iconMenu: (vm) => {
+      if (vm.drawer) {
+        return 'menu_open'
+      }
 
+      return 'menu'
+    }
+  },
   data () {
     return {
+      drawer: false,
       loggedUser: this.$globals.logged_user,
       links: [
         {
@@ -103,20 +83,6 @@ export default {
     }
   },
   methods: {
-    logout () {
-      LocalStorage.getAllKeys().forEach(key => LocalStorage.remove(key))
-
-      this.$axios.post('/auth/logout')
-        .then(() => {
-          this.$router.push('/login')
-        })
-        .catch(() => {
-          this.$router.push('/login')
-        })
-    },
-    profile () {
-      this.$router.push('/profile')
-    },
     index () {
       this.$router.push('/')
     },

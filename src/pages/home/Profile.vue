@@ -156,8 +156,8 @@
           </q-input>
 
           <q-input outlined
-            ref="password"
-            v-model="password"
+            ref="retypePassword"
+            v-model="retypePassword"
             label="Confirmar senha*"
             type="password"
             placeholder=""
@@ -203,7 +203,9 @@ export default {
       tab: 'pessoais',
       departments: this.getDepartments(),
       workSchedules: this.getWorkSchedules(),
-      user: this.$globals.logged_user
+      user: this.$globals.logged_user,
+      password: '',
+      retypePassword: ''
     }
   },
   methods: {
