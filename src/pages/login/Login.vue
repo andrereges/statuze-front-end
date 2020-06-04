@@ -63,14 +63,21 @@
           @click="login"
           :disabled="loading"
         >
-          <template v-if="loading">
-            <q-icon size="32px" name="sync" class="text-black" />
-            Entrando...
+          <div class="row">
+            <template v-if="loading">
+              <q-spinner-pie
+                glossy
+                unelevated
+                class="custumizacao"
+                size="1em"
+              />
+              Entrando...
           </template>
           <template v-else>
-            <q-icon size="32px" name="input" class="text-black" />
+            <q-icon size="32px" name="input" class="custumizacao" />
             Entrar
           </template>
+          </div>
         </q-btn>
       </q-card-section>
 
@@ -87,7 +94,7 @@ export default {
 
   data () {
     return {
-      email: 'USERNAME@lliege.com.br',
+      email: 'asantos@lliege.com.br',
       password: 'change123',
       loading: false
     }
@@ -146,5 +153,9 @@ export default {
 #login {
   background-color: #444;
   height: 100vh;
+}
+.custumizacao {
+  padding-right: 10px;
+  color: black
 }
 </style>

@@ -63,10 +63,20 @@ const globals = {
     return moment(dateTime, 'DD/MM/YYYY HH:mm:ss').format('HH:mm')
   },
   formatDateEN: (dateTime) => {
-    return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm')
+    return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD')
   },
   formatDateBR: (dateTime) => {
-    return moment(dateTime, 'DD/MM/YYYY HH:mm:ss HH:mm:ss').format('DD/MM/YYYY HH:mm')
+    return moment(dateTime, 'YYYY-MM-DD', true).format('DD/MM/YYYY')
+  },
+  calculateAge: (dateTime) => {
+    dateTime = moment(dateTime, 'YYYY-MM-DD', true)
+    return moment().diff(dateTime, 'years')
+  },
+  formatPhone: (phone) => {
+    if (phone) {
+      return `(${phone.substring(0, 2)}) ${phone.substring(2, 7)}-${phone.substring(7, 12)}`
+    }
+    return ''
   }
 }
 

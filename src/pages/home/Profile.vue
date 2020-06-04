@@ -14,7 +14,7 @@
             Voltar
           </q-tooltip>
         </q-btn>
-        <q-toolbar-title>INFORMAÇÕES</q-toolbar-title>
+        <q-toolbar-title >INFORMAÇÕES</q-toolbar-title>
       </q-bar>
 
       <q-tabs
@@ -34,10 +34,6 @@
         <q-tab name="seguranca">
           <q-icon size="32px" name="security" class="text-back" />
           <q-item-label>Segurança</q-item-label>
-        </q-tab>
-        <q-tab name="configuracoes">
-          <q-icon size="32px" name="settings" class="text-back" />
-          <q-item-label>Configurações</q-item-label>
         </q-tab>
 
       </q-tabs>
@@ -85,6 +81,24 @@
 
             <template v-slot:prepend>
               <q-icon name="mail" />
+            </template>
+          </q-input>
+
+          <div class= "row justify-left div-radio">
+            <q-radio v-model="user.gender" val="Masculino" label="Masculino" color="cyan" />
+            <q-radio v-model="user.gender" val="Feminino" label="Feminino" color="pink" />
+          </div>
+
+          <q-input outlined
+            ref="cellphone"
+            type="tel"
+            v-model="user.cellphone"
+            label="Telefone*"
+            mask="(##) #####-####"
+            hint="">
+
+            <template v-slot:prepend>
+              <q-icon name="phone" />
             </template>
           </q-input>
 
@@ -197,7 +211,6 @@ import { LocalStorage } from 'quasar'
 
 export default {
   name: 'Profile',
-
   data () {
     return {
       tab: 'pessoais',
@@ -229,6 +242,8 @@ export default {
       const formData = new FormData()
       formData.append('name', this.user.name)
       formData.append('email', this.user.email)
+      formData.append('cellphone', this.user.cellphone.toString().replace(/\D+/g, ''))
+      formData.append('gender', this.user.gender)
       formData.append('birth', this.user.birth)
       formData.append('department', this.user.department.id)
       formData.append('work_schedule', this.user.workSchedule.id)
@@ -256,6 +271,9 @@ export default {
 <style scoped>
 .div-btn {
   padding: 0 15px 0 15px;
+}
+.div-radio {
+  padding-bottom: 10px;
 }
 .div-uploader {
   padding: 0 0 20px 0;

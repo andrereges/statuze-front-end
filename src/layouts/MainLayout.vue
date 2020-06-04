@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar class="bg-black glossy text-white">
 
-        <q-btn flat @click="drawer = !drawer" round dense :icon="iconMenu" />
+        <q-btn flat round dense size="1.2rem" @click="drawer = !drawer" :icon="iconMenu" />
 
         <menu-left :drawer="drawer" :user="loggedUser"/>
 
@@ -40,7 +40,11 @@
             icon="sync"
             class="zoom glossy bg-amber text-black shadow-4"
             @click="refreshPage()"
-          />
+          >
+            <q-tooltip content-class="bg-indigo" content-style="font-size: 16px" :offset="[10, 10]">
+              Sincronizar com Servidor
+            </q-tooltip>
+          </q-btn>
         </q-page-sticky>
     </q-page-container>
   </q-layout>

@@ -14,6 +14,12 @@ const routes = [
         name: 'profile',
         meta: { title: 'Perfil' },
         component: () => import('pages/home/Profile.vue')
+      },
+      {
+        path: '/birthday',
+        name: 'birthday',
+        meta: { title: 'Aniversariantes' },
+        component: () => import('pages/home/Birthday.vue')
       }
     ]
   },

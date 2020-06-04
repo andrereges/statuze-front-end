@@ -54,32 +54,32 @@ const menuList = [
   {
     icon: 'list_alt',
     iconColor: 'black',
-    label: 'Administração',
-    routerName: { name: 'home' }
+    label: 'Administração'
+    // routerName: { name: 'administration' }
   },
   {
     icon: 'comment',
     iconColor: 'black',
-    label: 'Quadro de Sugestões',
-    routerName: { name: 'home' }
+    label: 'Quadro de Sugestões'
+    // routerName: { name: 'sugestion' }
   },
   {
     icon: 'cake',
     iconColor: 'black',
     label: 'Aniversariantes',
-    routerName: { name: 'home' }
+    routerName: { name: 'birthday' }
   },
   {
     icon: 'emoji_objects',
     iconColor: 'black',
-    label: 'Sobre',
-    routerName: { name: 'home' }
+    label: 'Sobre'
+    // routerName: { name: 'about' }
   },
   {
     icon: 'settings',
     iconColor: 'black',
-    label: 'Configurações',
-    routerName: { name: 'profile' }
+    label: 'Configurações'
+    // routerName: { name: 'settings' }
   },
   {
     icon: 'exit_to_app',
