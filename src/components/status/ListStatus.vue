@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     callDialog () {
-      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld, null)
+      this.$root.$emit('DialogChangeStatus::show', this.statusNew, this.statusOld, null)
     },
     isUserLogged (event, status) {
       if (event.detail.ids[0] !== `${this.$globals.logged_user.id}`) return
@@ -73,6 +73,16 @@ export default {
         event.detail.ids = []
         event.detail.ids[0] = `${this.$globals.logged_user.id}`
         this.added(event, status)
+      }
+
+      if (event.type === 'reordered') {
+        event.detail.index = 0
+        event.detail.ids = []
+        event.detail.ids[0] = `${this.$globals.logged_user.id}`
+        this.statusNew = status
+        this.statusOld = status
+        this.added(event, status)
+        this.removed(this.event, status)
       }
 
       if (event.type === 'removed') {
@@ -106,16 +116,6 @@ export default {
 
       this.statusOld = status
       this.callDialog()
-    },
-    reordered (event, status) {
-      if (this.statusChanged) {
-        const reorderedUsers =
-          status.users.filter((user) => event.detail.ids.map(Number).indexOf(user.id) >= 0)
-        const newUsers = status.users
-          .filter((user) => event.detail.ids.map(Number).indexOf(user.id) < 0)
-        newUsers.splice(event.detail.index, 0, ...reorderedUsers)
-        status.users = newUsers
-      }
     },
     getStatusesWithUsers () {
       this.$axios.get('/status/users')

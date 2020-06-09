@@ -50,7 +50,7 @@ export default {
                 id: user.id,
                 name: user.name,
                 age: this.$globals.calculateAge(user.birth),
-                birth: this.$globals.formatDateBR(user.birth),
+                birth: this.$globals.formatDate('BR', user.birth),
                 image: user.image
               })
             })

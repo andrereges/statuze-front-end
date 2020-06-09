@@ -4,7 +4,7 @@
     :key="user.id"
     :data-id="user.id"
     class="app-custom-item"
-    @dblclick="updateStatus(user)"
+    @dblclick="historicStatus(user)"
   >
 
     <q-item-section avatar top class="q-ml-none q-pa-xs q-pa-md">
@@ -31,10 +31,13 @@ export default {
     UserTooltip, UserChip
   },
   methods: {
-    updateStatus (user) {
-      if (user.id !== this.$globals.logged_user.id) return
-      this.statusNew = this.statusOld = user.user_status.status
-      this.$root.$emit('dialogChangeStatus::show', this.statusNew, this.statusOld)
+    historicStatus (user) {
+      if (
+        !this.$globals.userLoggedHasRoles(this.$globals.logged_user.roles, ['ADMIN', 'MANAGER']) &&
+        user.id !== this.$globals.logged_user.id
+      ) return
+
+      this.$root.$emit('DialogHistoricStatus::show', this.user)
     }
   }
 }

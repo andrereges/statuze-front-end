@@ -48,9 +48,25 @@ const globals = {
 
     return moment(d).format('HH:mm')
   },
-  getTime: (dateTime) => {
-    if (dateTime) {
+  getNow: () => {
+    return moment().format('YYYY-MM-DD')
+  },
+  plusHourAndMinutes: (startTime, endTime) => {
+    const hours = endTime.split(':')[0]
+    const minutes = endTime.split(':')[1]
+    return moment(moment(startTime, 'DD/MM/YYYY HH:mm'))
+      .add(hours, 'hours')
+      .add(minutes, 'minutes').format('HH:mm')
+  },
+  diffHourAndMinutes: (startTime, endTime) => {
+    return moment.utc(moment(endTime, 'DD/MM/YYYY HH:mm').diff(moment(startTime, 'DD/MM/YYYY HH:mm'))).format('HH:mm')
+  },
+  getTime: (locale, dateTime) => {
+    if (locale === 'EN' && dateTime) {
       return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')
+    }
+    if (locale === 'BR' && dateTime) {
+      return moment(dateTime, 'DD/MM/YYYY HH:mm:ss').format('HH:mm')
     }
 
     return moment().format('HH:mm')
@@ -62,11 +78,15 @@ const globals = {
 
     return moment(dateTime, 'DD/MM/YYYY HH:mm:ss').format('HH:mm')
   },
-  formatDateEN: (dateTime) => {
-    return moment(dateTime, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD')
-  },
-  formatDateBR: (dateTime) => {
-    return moment(dateTime, 'YYYY-MM-DD', true).format('DD/MM/YYYY')
+  formatDate: (locale, dateTime) => {
+    if (locale === 'EN' && dateTime) {
+      return moment(dateTime, 'YYYY-MM-DD').format('YYYY-MM-DD')
+    }
+    if (locale === 'BR' && dateTime) {
+      return moment(dateTime, 'DD/MM/YYYY').format('DD/MM/YYYY')
+    }
+
+    return moment().format('DD/MM/YYYY')
   },
   calculateAge: (dateTime) => {
     dateTime = moment(dateTime, 'YYYY-MM-DD', true)

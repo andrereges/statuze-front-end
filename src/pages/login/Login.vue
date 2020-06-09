@@ -94,7 +94,7 @@ export default {
 
   data () {
     return {
-      email: 'asantos@lliege.com.br',
+      email: 'USERNAME@lliege.com.br',
       password: 'change123',
       loading: false
     }

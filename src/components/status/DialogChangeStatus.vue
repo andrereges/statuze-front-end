@@ -150,15 +150,13 @@ export default {
     }
   },
   created () {
-    this.$root.$on('dialogChangeStatus::show', (statusNew, statusOld) => {
+    this.$root.$on('DialogChangeStatus::show', (statusNew, statusOld) => {
       this.statusNew = statusNew
       this.statusOld = statusOld
       this.expectedReturnLabel = `${this.statusNew.name} até às`
       this.getStatuses()
 
-      if (statusNew.name === 'Disponível') {
-        this.reason = { id: 9, name: 'Fale Comigo' }
-      }
+      this.setStatusDefault(statusNew)
 
       if (LocalStorage.getItem(`statuze_status_${this.statusNew.id}`)) {
         this.note = LocalStorage.getItem(`statuze_status_${this.statusNew.id}`)
@@ -188,7 +186,7 @@ export default {
         return 'O informe os campos obrigatórios'
       }
 
-      if (this.expectedReturn && this.expectedReturn <= this.$globals.getTime()) {
+      if (this.expectedReturn && this.expectedReturn <= this.$globals.getTime('EN', null)) {
         return 'A hora prevista do status deve ser maior que a atual.'
       }
 
@@ -226,6 +224,15 @@ export default {
         .catch((error) => {
           this.$globals.showNotify('error', error.message)
         })
+    },
+    setStatusDefault (status) {
+      if (status.name === 'Disponível') {
+        this.reason = { id: 9, name: 'Fale Comigo' }
+      }
+
+      if (status.name === 'Deslogado') {
+        this.reason = { id: 7, name: 'Sair Fora' }
+      }
     },
     cleanFields () {
       this.statusWithReasons = []
