@@ -78,12 +78,25 @@ const globals = {
 
     return moment(dateTime, 'DD/MM/YYYY HH:mm:ss').format('HH:mm')
   },
-  formatDate: (locale, dateTime) => {
-    if (locale === 'EN' && dateTime) {
-      return moment(dateTime, 'YYYY-MM-DD').format('YYYY-MM-DD')
+  formatDate: (localeFrom, localeTo, dateTime) => {
+    if (localeFrom === 'EN' && dateTime) {
+      if (localeTo === 'BR') {
+        return moment(dateTime, 'YYYY-MM-DD').format('DD/MM/YYYY')
+      }
+
+      if (localeTo === 'EN' && dateTime) {
+        return moment(dateTime, 'YYYY-MM-DD').format('YYYY-MM-DD')
+      }
     }
-    if (locale === 'BR' && dateTime) {
-      return moment(dateTime, 'DD/MM/YYYY').format('DD/MM/YYYY')
+
+    if (localeFrom === 'BR' && dateTime) {
+      if (localeTo === 'BR') {
+        return moment(dateTime, 'DD/MM/YYYY').format('DD/MM/YYYY')
+      }
+
+      if (localeTo === 'EN' && dateTime) {
+        return moment(dateTime, 'DD/MM/YYYY').format('YYYY-MM-DD')
+      }
     }
 
     return moment().format('DD/MM/YYYY')

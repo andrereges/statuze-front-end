@@ -7,6 +7,7 @@ const axiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
     Authorization: `Bearer ${LocalStorage.getItem('statuze_access_token')}`
   }
 })

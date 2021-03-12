@@ -36,15 +36,6 @@
                       {{ userStatus.reason.name }}
                     </div>
                   </div>
-                  <div class="row" v-if="userStatus.expectedReturn">
-                    <div>
-                      <template>
-                        <q-icon size="20px" name="hourglass_empty" />
-                        <span class="format-label"> PREVISTO ATÉ:</span>
-                      </template>
-                      {{ userStatus.expectedReturn }}
-                    </div>
-                  </div>
                   <div class="row">
                     <div>
                       <template>
@@ -99,7 +90,7 @@ export default {
   created () {
     this.$root.$on('DialogHistoricStatus::show', (user) => {
       this.user = user
-      this.date = this.$globals.formatDate('BR')
+      this.date = this.$globals.formatDate('BR', 'BR')
       this.getUserInfo()
       this.dialog = true
     })
@@ -110,13 +101,10 @@ export default {
         .then((response) => {
           if (response.data.data) {
             response.data.data.map(data => {
-              console.log(data.from)
               this.userStatuses.push({
                 id: data.id,
                 from: this.$globals.getTime('BR', data.from),
                 to: data.to ? this.$globals.getTime('BR', data.to) : '...',
-                expectedReturn: data.status_reason.reason.expected_return ? this.$globals
-                  .plusHourAndMinutes(data.from, data.status_reason.reason.expected_return) : '',
                 diff: data.to ? this.$globals.diffHourAndMinutes(data.from, data.to) : '',
                 note: data.note,
                 status: data.status_reason.status,
