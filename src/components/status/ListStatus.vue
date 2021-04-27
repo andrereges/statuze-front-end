@@ -118,7 +118,7 @@ export default {
       this.callDialog()
     },
     getStatusesWithUsers () {
-      this.$axios.get('/status/users')
+      this.$statuzeBackendAPI.get('/status/users')
         .then((response) => {
           if (response.data.data) {
             this.statusWithUsers = response.data.data

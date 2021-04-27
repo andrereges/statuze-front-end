@@ -97,7 +97,7 @@ export default {
   },
   methods: {
     getUserInfo () {
-      this.$axios.get(`/user-status/user/${this.user.id}/${this.$globals.getNow()}`)
+      this.$statuzeBackendAPI.get(`/user-status/user/${this.user.id}/${this.$globals.getNow()}`)
         .then((response) => {
           if (response.data.data) {
             response.data.data.map(data => {

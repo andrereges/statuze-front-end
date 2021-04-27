@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     getUsers () {
-      this.$axios.get('/user/birthdays/' + new Date().getMonth())
+      this.$statuzeBackendAPI.get('/user/birthdays/' + new Date().getMonth())
         .then((response) => {
           if (response.data.data) {
             response.data.data.map(user => {

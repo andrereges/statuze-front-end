@@ -168,7 +168,7 @@ export default {
   },
   methods: {
     getStatuses () {
-      this.$axios.get(`/status/${this.statusNew.id}`)
+      this.$statuzeBackendAPI.get(`/status/${this.statusNew.id}`)
         .then((response) => {
           if (response.data.data) {
             response.data.data.reasons.map(reason => {
@@ -215,7 +215,7 @@ export default {
       }
     },
     tryChangeStatus (data) {
-      this.$axios.post('/user-status', data)
+      this.$statuzeBackendAPI.post('/user-status', data)
         .then((response) => {
           this.$root.$emit('ListStatus::added', this.statusNew)
           this.$root.$emit('ListStatus::removed', this.statusOld)

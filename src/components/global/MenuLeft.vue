@@ -109,7 +109,7 @@ export default {
     logout () {
       LocalStorage.getAllKeys().forEach(key => LocalStorage.remove(key))
 
-      this.$axios.post('/auth/logout')
+      this.$statuzeBackendAPI.post('/auth/logout')
         .then(() => {
           this.$router.push({ name: 'login' })
         })

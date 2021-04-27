@@ -1,9 +1,11 @@
+
 import axios from 'axios'
 import { LocalStorage } from 'quasar'
 
-const axiosInstance = axios.create({
-  baseURL: process.env.API,
+const statuzeBackendAPI = axios.create({
+  baseURL: process.env.STATUZE_BACKEND_API,
   timeout: 30000,
+  withCredentials: false,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -13,7 +15,8 @@ const axiosInstance = axios.create({
 })
 
 export default ({ Vue }) => {
-  Vue.prototype.$axios = axiosInstance
+  Vue.prototype.$axios = axios
+  Vue.prototype.$statuzeBackendAPI = statuzeBackendAPI
 }
 
-export { axiosInstance }
+export { statuzeBackendAPI }

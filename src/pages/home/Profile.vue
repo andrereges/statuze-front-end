@@ -223,7 +223,7 @@ export default {
   },
   methods: {
     getDepartments () {
-      this.$axios.get('/department')
+      this.$statuzeBackendAPI.get('/department')
         .then((response) => {
           if (response.data.data) {
             this.departments = response.data.data
@@ -231,7 +231,7 @@ export default {
         })
     },
     getWorkSchedules () {
-      this.$axios.get('/work-schedule')
+      this.$statuzeBackendAPI.get('/work-schedule')
         .then((response) => {
           if (response.data.data) {
             this.workSchedules = response.data.data
@@ -252,7 +252,7 @@ export default {
       this.tryUpdate(formData)
     },
     tryUpdate (data) {
-      this.$axios.post('/user/update', data)
+      this.$statuzeBackendAPI.post('/user/update', data)
         .then((response) => {
           LocalStorage.set('statuze_user', response.data.data)
           this.$router.push({ name: 'home' })

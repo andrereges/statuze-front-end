@@ -124,7 +124,7 @@ export default {
     async tryAuth (payload) {
       this.loading = true
 
-      await this.$axios.post('/auth/login', payload)
+      await this.$statuzeBackendAPI.post('/auth/login', payload)
         .then((response) => {
           LocalStorage.set('statuze_user', response.data.logged_user)
           LocalStorage.set('statuze_access_token', response.data.access_token)
